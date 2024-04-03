@@ -1,0 +1,2 @@
+acessar o shell do mongo pelo docker 
+docker exec -it order-db mongosh "mongodb://admin:123456@localhost:27017"
