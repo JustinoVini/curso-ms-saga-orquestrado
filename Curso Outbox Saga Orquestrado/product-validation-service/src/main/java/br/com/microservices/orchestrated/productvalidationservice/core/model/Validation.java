@@ -24,7 +24,7 @@ public class Validation {
     private String orderId;
 
     @Column(nullable = false)
-    private String transcationId;
+    private String transactionId;
 
     @Column(nullable = false)
     private boolean success;
@@ -42,7 +42,7 @@ public class Validation {
         updatedAt = now;
     }
 
-    @PrePersist
+    @PreUpdate
     public void preUpdate() {
         updatedAt = LocalDateTime.now();
     }
