@@ -31,7 +31,7 @@ public class KafkaConfig {
     private String groupId;
 
     @Value("${spring.kafka.consumer.auto-offset-reset}")
-    private String autoOffSetReset;
+    private String autoOffsetReset;
 
     @Value("${spring.kafka.topic.orchestrator}")
     private String orchestratorTopic;
@@ -42,28 +42,26 @@ public class KafkaConfig {
     @Value("${spring.kafka.topic.payment-fail}")
     private String paymentFailTopic;
 
-    @Bean // cria uma fábrica de consumidores Kafka
+    @Bean
     public ConsumerFactory<String, String> consumerFactory() {
         return new DefaultKafkaConsumerFactory<>(consumerProps());
     }
 
-    // define as propriedades do consumidor kafka
     private Map<String, Object> consumerProps() {
         var props = new HashMap<String, Object>();
         props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
-        props.put(ConsumerConfig.GROUP_ID_CONFIG, groupId); // só serve pra consumo
+        props.put(ConsumerConfig.GROUP_ID_CONFIG, groupId);
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
-        props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, autoOffSetReset); // só serve pra consumo
+        props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, autoOffsetReset);
         return props;
     }
 
-    @Bean // Cria uma fábrica de produtores Kafka
+    @Bean
     public ProducerFactory<String, String> producerFactory() {
         return new DefaultKafkaProducerFactory<>(producerProps());
     }
 
-    // Define as propriedades do produtor Kafka
     private Map<String, Object> producerProps() {
         var props = new HashMap<String, Object>();
         props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
@@ -72,7 +70,7 @@ public class KafkaConfig {
         return props;
     }
 
-    @Bean // Cria um template Kafka para facilitar a produção de mensagens
+    @Bean
     public KafkaTemplate<String, String> kafkaTemplate(ProducerFactory<String, String> producerFactory) {
         return new KafkaTemplate<>(producerFactory);
     }
@@ -80,8 +78,8 @@ public class KafkaConfig {
     private NewTopic buildTopic(String name) {
         return TopicBuilder
                 .name(name)
-                .replicas(REPLICA_COUNT)
                 .partitions(PARTITION_COUNT)
+                .replicas(REPLICA_COUNT)
                 .build();
     }
 
@@ -89,7 +87,6 @@ public class KafkaConfig {
     public NewTopic orchestratorTopic() {
         return buildTopic(orchestratorTopic);
     }
-
     @Bean
     public NewTopic paymentSuccessTopic() {
         return buildTopic(paymentSuccessTopic);
@@ -99,5 +96,4 @@ public class KafkaConfig {
     public NewTopic paymentFailTopic() {
         return buildTopic(paymentFailTopic);
     }
-
 }

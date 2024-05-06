@@ -4,6 +4,6 @@ public enum EPaymentStatus {
 
     PENDING,
     SUCCESS,
-    REFUND;
+    REFUND
 
 }

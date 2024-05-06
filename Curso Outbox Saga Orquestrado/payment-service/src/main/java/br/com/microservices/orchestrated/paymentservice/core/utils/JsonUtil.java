@@ -5,6 +5,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import br.com.microservices.orchestrated.paymentservice.core.dto.Event;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.AllArgsConstructor;
+import org.springframework.stereotype.Component;
+
 @Component
 @AllArgsConstructor
 public class JsonUtil {
@@ -14,7 +19,7 @@ public class JsonUtil {
     public String toJson(Object object) {
         try {
             return objectMapper.writeValueAsString(object);
-        } catch (Exception e) {
+        } catch (Exception ex) {
             return "";
         }
     }
@@ -22,9 +27,8 @@ public class JsonUtil {
     public Event toEvent(String json) {
         try {
             return objectMapper.readValue(json, Event.class);
-        } catch (Exception e) {
+        } catch (Exception ex) {
             return null;
         }
     }
-
 }

@@ -10,10 +10,10 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
 @Data
-@AllArgsConstructor
-@NoArgsConstructor
-@Entity
 @Builder
+@Entity
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "payment")
 public class Payment {
 
@@ -55,5 +55,4 @@ public class Payment {
     public void preUpdate() {
         updatedAt = LocalDateTime.now();
     }
-
 }

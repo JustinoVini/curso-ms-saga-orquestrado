@@ -5,6 +5,5 @@ public enum ESagaStatus {
     SUCCESS,
     ROLLBACK_PENDING,
     FAIL
-    ;
 
 }

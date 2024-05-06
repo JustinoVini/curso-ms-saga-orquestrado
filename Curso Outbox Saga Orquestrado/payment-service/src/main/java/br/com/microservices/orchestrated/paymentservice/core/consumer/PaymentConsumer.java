@@ -13,7 +13,6 @@ import org.springframework.stereotype.Component;
 public class PaymentConsumer {
 
     private final PaymentService paymentService;
-
     private final JsonUtil jsonUtil;
 
     @KafkaListener(
@@ -21,7 +20,7 @@ public class PaymentConsumer {
             topics = "${spring.kafka.topic.payment-success}"
     )
     public void consumeSuccessEvent(String payload) {
-        log.info("Receiving event {} from payment-success Topic ", payload);
+        log.info("Receiving success event {} from payment-success topic", payload);
         var event = jsonUtil.toEvent(payload);
         paymentService.realizePayment(event);
     }
@@ -31,7 +30,7 @@ public class PaymentConsumer {
             topics = "${spring.kafka.topic.payment-fail}"
     )
     public void consumeFailEvent(String payload) {
-        log.info("Receiving rollback event {} from payment-fail Topic ", payload);
+        log.info("Receiving rollback event {} from payment-fail topic", payload);
         var event = jsonUtil.toEvent(payload);
         paymentService.realizeRefund(event);
     }
