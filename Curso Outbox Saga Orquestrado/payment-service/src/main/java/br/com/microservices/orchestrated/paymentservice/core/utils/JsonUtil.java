@@ -5,11 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 
-import br.com.microservices.orchestrated.paymentservice.core.dto.Event;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.AllArgsConstructor;
-import org.springframework.stereotype.Component;
-
 @Component
 @AllArgsConstructor
 public class JsonUtil {
