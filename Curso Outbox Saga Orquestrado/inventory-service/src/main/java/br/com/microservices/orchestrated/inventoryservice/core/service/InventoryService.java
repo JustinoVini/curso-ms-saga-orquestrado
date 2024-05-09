@@ -17,14 +17,14 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 
-import static br.com.microservices.orchestrated.inventoryservice.core.enums.ESagaStatus.SUCCESS;
+import static br.com.microservices.orchestrated.inventoryservice.core.enums.ESagaStatus.*;
 
 @Slf4j
 @Service
 @AllArgsConstructor
 public class InventoryService {
 
-    private static final String CURRENT_SOURCE = "PAYMENT_SERVICE";
+    private static final String CURRENT_SOURCE = "INVENTORY_SERVICE";
 
     private final JsonUtil jsonUtil;
     private final KafkaProducer producer;
@@ -36,8 +36,10 @@ public class InventoryService {
             checkCurrentValidation(event);
             createOrderInventory(event);
             updateInventory(event.getPayload());
+            handleSuccess(event);
         } catch (Exception ex) {
             log.error("Error trying to update inventory: ", ex);
+            handleFailCurrentNotExecuted(event, ex.getMessage());
         }
         producer.sendEvent(jsonUtil.toJson(event));
     }
@@ -108,6 +110,36 @@ public class InventoryService {
                 .createdAt(LocalDateTime.now())
                 .build();
         event.addToHistory(history);
+    }
+
+    public void rollbackInventory(Event event) {
+        event.setStatus(FAIL);
+        event.setSource(CURRENT_SOURCE);
+        try {
+            returnInventoryToPreviousValues(event);
+            addHistory(event, "Rollback executed for inventory!");
+        } catch (Exception ex) {
+            addHistory(event, "Rollback not executed for inventory: ".concat(ex.getMessage()));
+        }
+        producer.sendEvent(jsonUtil.toJson(event));
+    }
+
+    private void returnInventoryToPreviousValues(Event event) {
+        orderInventoryRepository
+                .findByOrderIdAndTransactionId(event.getPayload().getId(), event.getTransactionId())
+                .forEach(orderInventory -> {
+                    var inventory = orderInventory.getInventory();
+                    inventory.setAvailable(orderInventory.getOldQuantity());
+                    inventoryRepository.save(inventory);
+                    log.info("Restored inventory for order {} from {} to {}",
+                            event.getPayload().getId(), orderInventory.getNewQuantity(), inventory.getAvailable());
+                });
+    }
+
+    private void handleFailCurrentNotExecuted(Event event, String message) {
+        event.setStatus(ROLLBACK_PENDING);
+        event.setSource(CURRENT_SOURCE);
+        addHistory(event, "Fail to update inventory: ".concat(message));
     }
 
 }
